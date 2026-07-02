@@ -51,7 +51,7 @@ function App() {
 
   const fetchQuote = async (sym) => {
     try {
-      const res = await axios.get(`http://127.0.0.1:5000/api/quote/${sym}`);
+      const res = await axios.get(`https://stock-predictor-kpxf.onrender.com/api/quote/${sym}`);
       setQuote(res.data);
     } catch (e) { console.error(e); }
   };
@@ -64,9 +64,9 @@ function App() {
     try {
       const { period, interval } = periodMap[r];
       const [hist, sig, comp] = await Promise.all([
-        axios.get(`http://127.0.0.1:5000/api/stock/${sym}?period=${period}&interval=${interval}`),
-        axios.get(`http://127.0.0.1:5000/api/signal/${sym}`),
-        axios.get(`http://127.0.0.1:5000/api/company/${sym}`)
+        axios.get(`https://stock-predictor-kpxf.onrender.com/api/stock/${sym}?period=${period}&interval=${interval}`),
+        axios.get(`https://stock-predictor-kpxf.onrender.com/api/signal/${sym}`),
+        axios.get(`https://stock-predictor-kpxf.onrender.com/api/company/${sym}`)
       ]);
       setStockData(hist.data);
       setSignal(sig.data);
