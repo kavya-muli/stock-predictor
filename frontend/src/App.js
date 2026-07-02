@@ -112,7 +112,7 @@ function App() {
   }, [ticker, phase]);
 
   const signalClass = signal?.signal === 'BUY' ? 'buy' : signal?.signal === 'SELL' ? 'sell' : 'hold';
-  const activeTabObj = TABS.find(t => t.id === activeTab);
+  /*const activeTabObj = TABS.find(t => t.id === activeTab);*/
 
   /* ─── HERO ─── */
   if (phase === 'hero') return (
