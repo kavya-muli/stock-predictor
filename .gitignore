@@ -1,0 +1,6 @@
+backend/venv/
+backend/models/
+backend/__pycache__/
+frontend/node_modules/
+frontend/build/
+.env
