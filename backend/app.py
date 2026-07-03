@@ -27,7 +27,9 @@ import numpy as np
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
 app = Flask(__name__)
+
 CORS(app, origins=[
+    "https://stock-predictor-git-main-kavya-muli1.vercel.app",
     "https://stock-predictor-gilt.vercel.app",
     "http://localhost:3000"
 ])
