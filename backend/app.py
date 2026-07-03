@@ -1,3 +1,18 @@
+import time
+
+def safe_download(ticker, period='1y', interval='1d'):
+    for attempt in range(3):
+        try:
+            df = safe_download(ticker, period=period, interval=interval)
+            if not df.empty:
+                return df
+            time.sleep(2)
+        except Exception as e:
+            if attempt < 2:
+                time.sleep(3)
+            else:
+                raise e
+    return pd.DataFrame()
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 import yfinance as yf
@@ -25,7 +40,7 @@ def search_stock():
 def get_stock_data(ticker):
     period = request.args.get('period', '6mo')
     interval = request.args.get('interval', '1d')
-    df = yf.download(ticker, period=period, interval=interval)
+    df = safe_download(ticker, period=period, interval=interval)
 
     if isinstance(df.columns, pd.MultiIndex):
         df.columns = df.columns.get_level_values(0)
@@ -104,7 +119,7 @@ def get_quote(ticker):
 
 @app.route('/api/signal/<ticker>')
 def signal(ticker):
-    df = yf.download(ticker, period="1y")
+    df = safe_download(ticker, period="1y")
 
     if isinstance(df.columns, pd.MultiIndex):
         df.columns = df.columns.get_level_values(0)
@@ -176,7 +191,7 @@ def compare_stocks():
     for ticker in tickers:
 
         try:
-            df = yf.download(ticker, period="1y")
+            df = safe_download(ticker, period="1y")
 
             if isinstance(df.columns, pd.MultiIndex):
                 df.columns = df.columns.get_level_values(0)
