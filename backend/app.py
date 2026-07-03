@@ -1,17 +1,23 @@
 import time
 
+import time
+
 def safe_download(ticker, period='1y', interval='1d'):
     for attempt in range(3):
         try:
-            df = safe_download(ticker, period=period, interval=interval)
+            df = yf.download(ticker, period=period, interval=interval)
+
             if not df.empty:
                 return df
+
             time.sleep(2)
+
         except Exception as e:
             if attempt < 2:
                 time.sleep(3)
             else:
                 raise e
+
     return pd.DataFrame()
 from flask import Flask, jsonify, request
 from flask_cors import CORS
@@ -21,10 +27,6 @@ import numpy as np
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
 app = Flask(__name__)
-CORS(app, origins=[
-    "https://stock-predictor-gilt.vercel.app",
-    "http://localhost:3000"
-])
 CORS(app, origins=[
     "https://stock-predictor-gilt.vercel.app",
     "http://localhost:3000"
