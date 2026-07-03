@@ -25,6 +25,7 @@ import yfinance as yf
 import pandas as pd
 import numpy as np
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+from functools import lru_cache
 
 app = Flask(__name__)
 
@@ -57,11 +58,18 @@ def get_stock_data(ticker):
 
     data = df[['Date', 'Open', 'High', 'Low', 'Close', 'Volume']].to_dict('records')
     return jsonify(data)
+@lru_cache(maxsize=100)
+def fetch_stock_info(ticker):
+    stock = yf.Ticker(ticker)
+    return stock.info
+
 
 @app.route('/api/company/<ticker>')
 def get_company_info(ticker):
-    stock = yf.Ticker(ticker)
-    info = stock.info
+    try:
+        info = fetch_stock_info(ticker)
+    except Exception as e:
+        return jsonify({"error": "Could not fetch company data, please try again shortly."}), 503
 
     ceo = "N/A"
     officers = info.get("companyOfficers", [])
@@ -69,7 +77,6 @@ def get_company_info(ticker):
         if "CEO" in officer.get("title", ""):
             ceo = officer.get("name")
             break
-
     market_cap = info.get("marketCap")
     market_cap_formatted = None
     if market_cap:
@@ -79,7 +86,6 @@ def get_company_info(ticker):
             market_cap_formatted = f"${market_cap / 1e9:.2f}B"
         else:
             market_cap_formatted = f"${market_cap / 1e6:.2f}M"
-
     return jsonify({
         "name": info.get("longName", ticker),
         "ceo": ceo,
@@ -88,7 +94,7 @@ def get_company_info(ticker):
         "marketCap": market_cap_formatted,
         "peRatio": round(info.get("trailingPE"), 2) if info.get("trailingPE") else "N/A",
         "description": info.get("longBusinessSummary", "")
-    }) 
+    })
 @app.route('/api/quote/<ticker>')
 def get_quote(ticker):
     stock = yf.Ticker(ticker)
