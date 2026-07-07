@@ -32,6 +32,7 @@ app = Flask(__name__)
 CORS(app, origins=[
     "https://stock-predictor-git-main-kavya-muli1.vercel.app",
     "https://stock-predictor-gilt.vercel.app",
+    "http://localhost:3002",
     "http://localhost:3000"
 ])
 @app.route('/api/search')
