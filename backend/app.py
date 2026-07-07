@@ -59,18 +59,29 @@ def get_stock_data(ticker):
 
     data = df[['Date', 'Open', 'High', 'Low', 'Close', 'Volume']].to_dict('records')
     return jsonify(data)
-@lru_cache(maxsize=100)
-def fetch_stock_info(ticker):
-    stock = yf.Ticker(ticker)
-    return stock.info
+import os
+import requests
 
+FINNHUB_API_KEY = os.environ.get("FINNHUB_API_KEY")
+
+@lru_cache(maxsize=100)
+def fetch_company_info(ticker):
+    url = f"https://finnhub.io/api/v1/stock/profile2?symbol={ticker}&token={FINNHUB_API_KEY}"
+    response = requests.get(url, timeout=10)
+    response.raise_for_status()
+    data = response.json()
+    if not data:
+        raise ValueError("No data found for this ticker")
+    return data
 
 @app.route('/api/company/<ticker>')
 def get_company_info(ticker):
     try:
-        info = fetch_stock_info(ticker)
+        info = fetch_company_info(ticker)
+        return jsonify(info)
     except Exception as e:
         return jsonify({"error": "Could not fetch company data, please try again shortly."}), 503
+
 
     ceo = "N/A"
     officers = info.get("companyOfficers", [])
